@@ -1,0 +1,388 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Restoran — milliy taomlar yetkazib berish</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:ital,wght@0,500;0,600;0,700;1,500&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="{% static 'core/style.css' %}">
+</head>
+
+<body>
+
+<!-- SAHIFA YUKLANISHDAN OLINGAN REJIMNI DARHOL QO'LLASH (MILTILLASHNI OLDINI OLADI) -->
+<script>
+  if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+  }
+</script>
+
+<header class="site-header">
+  <div class="wrap header-row">
+
+    <a href="{% url 'home' %}" class="brand">
+
+      <svg class="brand-mark"
+           viewBox="0 0 40 40"
+           fill="none"
+           xmlns="http://www.w3.org/2000/svg">
+
+        <circle
+          cx="20"
+          cy="20"
+          r="18.5"
+          stroke="#d4a94a"
+          stroke-width="1.2"
+        />
+
+        <path
+          d="M13 24c1-6 4-10 7-13 3 3 6 7 7 13-2 2-5 3-7 3s-5-1-7-3z"
+          fill="#c1440e"
+        />
+
+        <path
+          d="M20 11v3"
+          stroke="#d4a94a"
+          stroke-width="1.2"
+        />
+
+      </svg>
+
+      <span class="brand-name">Resto<em>ran</em></span>
+
+    </a>
+
+
+    <!-- O'RTA MENYU -->
+    <nav class="header-nav">
+
+      <a href="{% url 'home' %}" class="current">
+        Bosh sahifa
+      </a>
+
+      <a href="{% url 'menu' %}">
+        Menyu
+      </a>
+
+      <a href="{% url 'about' %}">
+        Biz haqimizda
+      </a>
+
+    </nav>
+
+
+    <!-- O'NG TOMON TUGMALARI (THEME + SAVAT) -->
+    <div class="header-actions">
+
+      <button
+        class="theme-toggle"
+        id="themeToggle"
+        type="button"
+        aria-label="Dark mode">
+
+        🌙
+
+      </button>
+
+      <a
+        class="cart-btn"
+        id="cartLink"
+        data-cart-link="{% url 'cart' %}"
+        href="{% url 'cart' %}">
+
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6">
+
+          <path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"/>
+
+          <circle cx="9" cy="21" r="1.4"/>
+
+          <circle cx="17" cy="21" r="1.4"/>
+
+        </svg>
+
+        Savat
+
+        <span class="cart-count" id="cartCount">
+          0
+        </span>
+
+      </a>
+
+    </div>
+
+  </div>
+</header>
+
+
+<!-- ================= HERO ================= -->
+
+<section class="hero">
+
+  <div class="wrap">
+
+    <div class="hero-eyebrow">
+      Kechqurun bozor chirog'i yonganda ham dasturxon och
+    </div>
+
+    <h1>
+      Milliy taomlar, uyingizga yetib boradi
+    </h1>
+
+    <p class="lede">
+      Issiq osh, ko'mirda pishgan shashlik va choynakda damlangan choy —
+      menyudan tanlang, biz qolganini pishiramiz va eshigingizga olib kelamiz.
+    </p>
+
+    <div class="hero-actions">
+
+      <a
+        href="{% url 'menu' %}"
+        class="btn-primary">
+
+        Menyuni ochish
+
+      </a>
+
+      <a
+        href="{% url 'about' %}"
+        class="btn-ghost">
+
+        Restoran haqida
+
+      </a>
+
+    </div>
+
+
+    <div class="hero-strip">
+
+      <div class="hero-strip-item">
+
+        <div class="num">
+          09:00–23:00
+        </div>
+
+        <div class="lbl">
+          Har kuni ish vaqti
+        </div>
+
+      </div>
+
+
+      <div class="hero-strip-item">
+
+        <div class="num">
+          30–40 daq
+        </div>
+
+        <div class="lbl">
+          O'rtacha yetkazish vaqti
+        </div>
+
+      </div>
+
+
+      <div class="hero-strip-item">
+
+        <div class="num">
+          20+
+        </div>
+
+        <div class="lbl">
+          Milliy va zamonaviy taomlar
+        </div>
+
+      </div>
+
+
+      <div class="hero-strip-item">
+
+        <div class="num">
+          100%
+        </div>
+
+        <div class="lbl">
+          Yangi tayyorlangan
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= SECTION ================= -->
+
+<section class="section">
+
+  <div class="wrap">
+
+    <div class="section-head">
+
+      <h2>
+        Nimadan boshlaymiz?
+      </h2>
+
+      <a
+        href="{% url 'menu' %}"
+        class="link-more">
+
+        To'liq menyu
+
+      </a>
+
+    </div>
+
+
+    <div class="feature-row">
+
+      <div class="feature-card">
+
+        <div class="tag">
+          Sho'rvalar
+        </div>
+
+        <h3>
+          Birinchi taomlar
+        </h3>
+
+        <p>
+          Mastava va lag'mon sho'rva —
+          sovuq kunlar uchun issiq boshlanish.
+        </p>
+
+      </div>
+
+
+      <div class="feature-card">
+
+        <div class="tag">
+          Asosiy
+        </div>
+
+        <h3>
+          Milliy taomlar
+        </h3>
+
+        <p>
+          Osh, manti va shashlik —
+          mehmonlar eng ko'p tanlaydigan taomlar.
+        </p>
+
+      </div>
+
+
+      <div class="feature-card">
+
+        <div class="tag">
+          Yakunida
+        </div>
+
+        <h3>
+          Ichimlik va shirinlik
+        </h3>
+
+        <p>
+          Ayron, ko'k choy va uy halvasi bilan
+          dasturxonni yakunlang.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer id="hakida">
+
+  <div class="wrap foot-grid">
+
+    <div>
+
+      <span class="brand-name">
+        Resto<em>ran</em>
+      </span>
+
+      <p class="foot-note">
+        Har bir mehmon — bizning dasturxonimizga aziz mehmon.
+        Buyurtmangizni bering, qolganini bizga ishoning.
+      </p>
+
+    </div>
+
+
+    <div class="foot-hours">
+
+      <strong>
+        Ish vaqti
+      </strong>
+
+      Har kuni: 09:00 – 23:00
+      <br>
+
+      Yetkazib berish: 10:00 – 22:30
+
+    </div>
+
+  </div>
+
+</footer>
+
+
+<!-- ================= SCRIPTS ================= -->
+
+<script src="{% static 'core/cart.js' %}"></script>
+
+<script>
+
+  /* SAVAT */
+
+  const cart = readCartFromURL();
+
+  renderCartBadge(cart);
+
+  refreshCartLinks(cart);
+
+
+  /* DARK MODE */
+
+  const themeToggle = document.getElementById("themeToggle");
+
+  if (document.body.classList.contains("dark")) {
+    themeToggle.textContent = "☀️";
+  }
+
+  themeToggle.addEventListener("click", function () {
+
+    document.body.classList.toggle("dark");
+
+    const isDark = document.body.classList.contains("dark");
+
+    themeToggle.textContent = isDark ? "☀️" : "🌙";
+
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+
+  });
+
+</script>
+
+</body>
+</html>

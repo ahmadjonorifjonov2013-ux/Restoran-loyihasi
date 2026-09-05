@@ -1,0 +1,175 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buyurtmani rasmiylashtirish — Restoran</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:ital,wght@0,500;0,600;0,700;1,500&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'core/style.css' %}">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-row">
+    <a href="{% url 'home' %}" class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="18.5" stroke="#d4a94a" stroke-width="1.2"/>
+        <path d="M13 24c1-6 4-10 7-13 3 3 6 7 7 13-2 2-5 3-7 3s-5-1-7-3z" fill="#c1440e"/>
+        <path d="M20 11v3" stroke="#d4a94a" stroke-width="1.2"/>
+      </svg>
+      <span class="brand-name">Resto<em>ran</em></span>
+    </a>
+    <nav class="header-nav">
+      <a href="{% url 'home' %}">Bosh sahifa</a>
+      <a href="{% url 'menu' %}">Menyu</a>
+      <a href="{% url 'about' %}">Biz haqimizda</a>
+    </nav>
+    <a class="cart-btn" id="cartLink" href="{% url 'cart' %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="21" r="1.4"/><circle cx="17" cy="21" r="1.4"/></svg>
+      Savat
+      <span class="cart-count" id="cartCount">0</span>
+    </a>
+  </div>
+</header>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head" style="justify-content:center;border-bottom:none;">
+      <h2>Buyurtmani rasmiylashtirish</h2>
+    </div>
+    <div class="receipt" id="receipt">
+      <div class="load-note">
+        <div class="dot-load"><span></span><span></span><span></span></div><br>
+        Yuklanmoqda…
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <span class="brand-name">Resto<em>ran</em></span>
+      <p class="foot-note">Ma'lumotlaringizni kiriting — biz siz bilan bog'lanamiz va taomni tayyorlashni boshlaymiz.</p>
+    </div>
+    <div class="foot-hours">
+      <strong>Ish vaqti</strong>
+      Har kuni: 09:00 – 23:00<br>
+      Yetkazib berish: 10:00 – 22:30
+    </div>
+  </div>
+</footer>
+
+<script src="{% static 'core/data.js' %}"></script>
+<script src="{% static 'core/cart.js' %}"></script>
+<script>
+let cart = readCartFromURL();
+let deliveryType = 'delivery';
+
+function refreshHeader(){
+  renderCartBadge(cart);
+  document.getElementById('cartLink').setAttribute('href', cartURL('savat.html', cart));
+}
+
+function lines(){
+  return Object.entries(cart).map(([id, qty])=>{
+    const dish = findDish(id);
+    return dish ? { id, dish, qty } : null;
+  }).filter(Boolean);
+}
+
+function render(){
+  const box = document.getElementById('receipt');
+  const ls = lines();
+
+  if(!ls.length){
+    box.innerHTML = `
+      <div class="receipt-empty">
+        Savat bo'sh — avval menyudan taom tanlang.<br><br>
+        <a href="{% url 'menu' %}" class="btn-primary">Menyuga o'tish</a>
+      </div>`;
+    return;
+  }
+
+  const total = ls.reduce((s,{dish,qty})=> s + field.dishPrice(dish)*qty, 0);
+
+  box.innerHTML = `
+    <div class="receipt-head">
+      <div class="serif">Buyurtma tafsilotlari</div>
+      <div class="muted">${ls.length} ta taom · ${fmt(total)} so'm</div>
+    </div>
+    <div class="toggle-row">
+      <button type="button" class="toggle-opt active" data-type="delivery">Yetkazib berish</button>
+      <button type="button" class="toggle-opt" data-type="pickup">Olib ketish</button>
+    </div>
+    <div class="field"><label for="ckName">Ismingiz</label><input id="ckName" type="text" placeholder="Ism familiya"></div>
+    <div class="field"><label for="ckPhone">Telefon raqam</label><input id="ckPhone" type="tel" placeholder="+998 90 123 45 67"></div>
+    <div class="field" id="addrField"><label for="ckAddr">Yetkazib berish manzili</label><input id="ckAddr" type="text" placeholder="Ko'cha, uy, kvartira"></div>
+    <div class="field"><label for="ckNote">Izoh (ixtiyoriy)</label><textarea id="ckNote" rows="2" placeholder="Qo'shimcha izoh"></textarea></div>
+    <div class="form-error" id="ckError">Iltimos, ism va telefon raqamni to'ldiring.</div>
+    <div class="receipt-sum" style="border-top:1px dashed var(--line-strong);padding-top:16px;">
+      <div class="sum-row total"><span>Jami</span><span>${fmt(total)} so'm</span></div>
+      <button class="btn-primary" style="width:100%;" id="ckSubmit">Buyurtma berish</button>
+    </div>
+  `;
+
+  box.querySelectorAll('.toggle-opt').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      box.querySelectorAll('.toggle-opt').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      deliveryType = b.dataset.type;
+      document.getElementById('addrField').style.display = deliveryType==='delivery' ? 'block' : 'none';
+    });
+  });
+  document.getElementById('ckSubmit').addEventListener('click', submitOrder);
+}
+
+async function submitOrder(){
+  const name = document.getElementById('ckName').value.trim();
+  const phone = document.getElementById('ckPhone').value.trim();
+  const addr = document.getElementById('ckAddr')?.value.trim() || '';
+  const note = document.getElementById('ckNote').value.trim();
+  const errEl = document.getElementById('ckError');
+
+  if(!name || !phone){ errEl.style.display='block'; return; }
+  errEl.style.display='none';
+
+  const ls = lines();
+  const payload = {
+    customer_name: name,
+    phone,
+    delivery_type: deliveryType,
+    address: deliveryType==='delivery' ? addr : '',
+    comment: note,
+    items: ls.map(({id, qty}) => ({ dish: Number(id), quantity: qty })),
+  };
+
+  const btn = document.getElementById('ckSubmit');
+  btn.disabled = true; btn.textContent = 'Yuborilmoqda…';
+
+  let orderNo = '—';
+  try{
+    const res = await fetch(CONFIG.API_BASE + CONFIG.ENDPOINTS.orders, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if(res.ok){
+      const data = await res.json();
+      orderNo = data.id ?? data.order_id ?? '—';
+    }
+  }catch(e){ /* demo rejimida ham tasdiq sahifasi ko'rsatiladi */ }
+
+  location.href = `{% url "order_success" %}?order=${encodeURIComponent(orderNo)}`;
+}
+
+loadMenuData().then(()=>{
+  refreshHeader();
+  render();
+});
+</script>
+</body>
+</html>

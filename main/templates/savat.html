@@ -1,0 +1,143 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Savat — Restoran</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:ital,wght@0,500;0,600;0,700;1,500&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'core/style.css' %}">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-row">
+    <a href="{% url 'home' %}" class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="20" cy="20" r="18.5" stroke="#d4a94a" stroke-width="1.2"/>
+        <path d="M13 24c1-6 4-10 7-13 3 3 6 7 7 13-2 2-5 3-7 3s-5-1-7-3z" fill="#c1440e"/>
+        <path d="M20 11v3" stroke="#d4a94a" stroke-width="1.2"/>
+      </svg>
+      <span class="brand-name">Resto<em>ran</em></span>
+    </a>
+    <nav class="header-nav">
+      <a href="{% url 'home' %}">Bosh sahifa</a>
+      <a href="{% url 'menu' %}" id="backToMenu">Menyu</a>
+      <a href="{% url 'about' %}">Biz haqimizda</a>
+    </nav>
+    <a class="cart-btn" id="cartLink" data-cart-link="{% url 'cart' %}" href="{% url 'cart' %}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="21" r="1.4"/><circle cx="17" cy="21" r="1.4"/></svg>
+      Savat
+      <span class="cart-count" id="cartCount">0</span>
+    </a>
+  </div>
+</header>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head" style="justify-content:center;border-bottom:none;">
+      <h2>Savatingiz</h2>
+    </div>
+    <div class="receipt" id="receipt">
+      <div class="load-note">
+        <div class="dot-load"><span></span><span></span><span></span></div><br>
+        Yuklanmoqda…
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div>
+      <span class="brand-name">Resto<em>ran</em></span>
+      <p class="foot-note">Savatingizni tekshirib, buyurtmani bir necha bosishda rasmiylashtiring.</p>
+    </div>
+    <div class="foot-hours">
+      <strong>Ish vaqti</strong>
+      Har kuni: 09:00 – 23:00<br>
+      Yetkazib berish: 10:00 – 22:30
+    </div>
+  </div>
+</footer>
+
+<script src="{% static 'core/data.js' %}"></script>
+<script src="{% static 'core/cart.js' %}"></script>
+<script>
+let cart = readCartFromURL();
+
+function refreshHeader(){
+  renderCartBadge(cart);
+  refreshCartLinks(cart);
+  document.getElementById('backToMenu').setAttribute('href', cartURL("{% url 'menu' %}", cart));
+  syncURL(cart);
+}
+
+function changeQty(id, delta){
+  cart[id] = (cart[id]||0) + delta;
+  if(cart[id] <= 0) delete cart[id];
+  refreshHeader();
+  render();
+}
+function removeLine(id){ delete cart[id]; refreshHeader(); render(); }
+
+function render(){
+  const box = document.getElementById('receipt');
+  const lines = Object.entries(cart).map(([id, qty])=>{
+    const dish = findDish(id);
+    return dish ? { id, dish, qty } : null;
+  }).filter(Boolean);
+
+  if(!lines.length){
+    box.innerHTML = `
+      <div class="receipt-empty">
+        Savat hali bo'sh.<br><br>
+        <a href="{% url 'menu' %}" class="btn-primary">Menyuga qaytish</a>
+      </div>`;
+    return;
+  }
+
+  const total = lines.reduce((s,{dish,qty})=> s + field.dishPrice(dish)*qty, 0);
+
+  box.innerHTML = `
+    <div class="receipt-head">
+      <div class="serif">Buyurtma cheki</div>
+      <div class="muted">${lines.length} ta taom</div>
+    </div>
+    ${lines.map(({id,dish,qty})=>`
+      <div class="receipt-line">
+        <div class="rl-name">
+          <div class="n">${field.dishName(dish)}</div>
+          <div class="u">${fmt(field.dishPrice(dish))} so'm / dona</div>
+          <div class="qty-row">
+            <button class="qty-btn" data-dec="${id}">−</button>
+            <span class="qty-val">${qty}</span>
+            <button class="qty-btn" data-inc="${id}">+</button>
+            <button class="remove-line" data-rm="${id}">olib tashlash</button>
+          </div>
+        </div>
+        <div class="rl-total">${fmt(field.dishPrice(dish)*qty)}</div>
+      </div>
+    `).join('')}
+    <div class="receipt-sum">
+      <div class="sum-row"><span>Taomlar narxi</span><span>${fmt(total)} so'm</span></div>
+      <div class="sum-row total"><span>Jami</span><span>${fmt(total)} so'm</span></div>
+      <a class="btn-primary" style="display:block;text-align:center;" id="checkoutLink" data-cart-link="{% url 'checkout' %}" href="{% url 'checkout' %}">Buyurtmani rasmiylashtirish</a>
+    </div>
+  `;
+
+  box.querySelectorAll('[data-inc]').forEach(b=>b.addEventListener('click',()=>changeQty(b.dataset.inc,1)));
+  box.querySelectorAll('[data-dec]').forEach(b=>b.addEventListener('click',()=>changeQty(b.dataset.dec,-1)));
+  box.querySelectorAll('[data-rm]').forEach(b=>b.addEventListener('click',()=>removeLine(b.dataset.rm)));
+  refreshCartLinks(cart);
+}
+
+loadMenuData().then(()=>{
+  refreshHeader();
+  render();
+});
+</script>
+</body>
+</html>

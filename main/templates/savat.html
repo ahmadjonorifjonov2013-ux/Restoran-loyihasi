@@ -12,6 +12,12 @@
 </head>
 <body>
 
+<script>
+  if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+  }
+</script>
+
 <header class="site-header">
   <div class="wrap header-row">
     <a href="{% url 'home' %}" class="brand">
@@ -27,11 +33,14 @@
       <a href="{% url 'menu' %}" id="backToMenu">Menyu</a>
       <a href="{% url 'about' %}">Biz haqimizda</a>
     </nav>
-    <a class="cart-btn" id="cartLink" data-cart-link="{% url 'cart' %}" href="{% url 'cart' %}">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="21" r="1.4"/><circle cx="17" cy="21" r="1.4"/></svg>
-      Savat
-      <span class="cart-count" id="cartCount">0</span>
-    </a>
+    <div class="header-actions">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Dark mode">🌙</button>
+      <a class="cart-btn" id="cartLink" data-cart-link="{% url 'cart' %}" href="{% url 'cart' %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="21" r="1.4"/><circle cx="17" cy="21" r="1.4"/></svg>
+        Savat
+        <span class="cart-count" id="cartCount">0</span>
+      </a>
+    </div>
   </div>
 </header>
 
@@ -71,7 +80,8 @@ let cart = readCartFromURL();
 function refreshHeader(){
   renderCartBadge(cart);
   refreshCartLinks(cart);
-  document.getElementById('backToMenu').setAttribute('href', cartURL("{% url 'menu' %}", cart));
+  const backBtn = document.getElementById('backToMenu');
+  if (backBtn) backBtn.setAttribute('href', cartURL("{% url 'menu' %}", cart));
   syncURL(cart);
 }
 
@@ -81,12 +91,22 @@ function changeQty(id, delta){
   refreshHeader();
   render();
 }
-function removeLine(id){ delete cart[id]; refreshHeader(); render(); }
+
+function removeLine(id){ 
+  delete cart[id]; 
+  refreshHeader(); 
+  render(); 
+}
 
 function render(){
   const box = document.getElementById('receipt');
+  if (!box) return;
+
   const lines = Object.entries(cart).map(([id, qty])=>{
-    const dish = findDish(id);
+    let dish = typeof findDish === 'function' ? (findDish(id) || findDish(Number(id))) : null;
+    if (!dish && typeof DISHES !== 'undefined') {
+      dish = DISHES.find(d => String(d.id) === String(id));
+    }
     return dish ? { id, dish, qty } : null;
   }).filter(Boolean);
 
@@ -99,28 +119,39 @@ function render(){
     return;
   }
 
-  const total = lines.reduce((s,{dish,qty})=> s + field.dishPrice(dish)*qty, 0);
+  const getPrice = (d) => (typeof field !== 'undefined' && field.dishPrice) ? field.dishPrice(d) : (d.narx || d.price || 0);
+  const getName = (d) => (typeof field !== 'undefined' && field.dishName) ? field.dishName(d) : (d.nom || d.name || '');
+  const getDesc = (d) => (typeof field !== 'undefined' && field.dishDesc) ? field.dishDesc(d) : (d.tavsif || d.description || d.masalliqlar || '');
+  const getImg = (d) => (typeof field !== 'undefined' && field.dishImg) ? field.dishImg(d) : (d.rasm || d.image || d.img || '');
+
+  const total = lines.reduce((s,{dish,qty})=> s + getPrice(dish)*qty, 0);
 
   box.innerHTML = `
     <div class="receipt-head">
       <div class="serif">Buyurtma cheki</div>
       <div class="muted">${lines.length} ta taom</div>
     </div>
-    ${lines.map(({id,dish,qty})=>`
-      <div class="receipt-line">
-        <div class="rl-name">
-          <div class="n">${field.dishName(dish)}</div>
-          <div class="u">${fmt(field.dishPrice(dish))} so'm / dona</div>
-          <div class="qty-row">
-            <button class="qty-btn" data-dec="${id}">−</button>
-            <span class="qty-val">${qty}</span>
-            <button class="qty-btn" data-inc="${id}">+</button>
-            <button class="remove-line" data-rm="${id}">olib tashlash</button>
+    ${lines.map(({id,dish,qty})=>{
+      const desc = getDesc(dish);
+      const imgSrc = getImg(dish);
+      return `
+        <div class="receipt-line" style="display:flex; gap:12px; align-items:center;">
+          ${imgSrc ? `<img src="${imgSrc}" alt="${getName(dish)}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; flex-shrink:0;">` : ''}
+          <div class="rl-name" style="flex-grow:1;">
+            <div class="n">${getName(dish)}</div>
+            ${desc ? `<div class="muted" style="font-size:0.85rem; margin-bottom:4px;">${desc}</div>` : ''}
+            <div class="u">${fmt(getPrice(dish))} so'm / dona</div>
+            <div class="qty-row">
+              <button class="qty-btn" data-dec="${id}">−</button>
+              <span class="qty-val">${qty}</span>
+              <button class="qty-btn" data-inc="${id}">+</button>
+              <button class="remove-line" data-rm="${id}">olib tashlash</button>
+            </div>
           </div>
+          <div class="rl-total">${fmt(getPrice(dish)*qty)} so'm</div>
         </div>
-        <div class="rl-total">${fmt(field.dishPrice(dish)*qty)}</div>
-      </div>
-    `).join('')}
+      `;
+    }).join('')}
     <div class="receipt-sum">
       <div class="sum-row"><span>Taomlar narxi</span><span>${fmt(total)} so'm</span></div>
       <div class="sum-row total"><span>Jami</span><span>${fmt(total)} so'm</span></div>
@@ -134,10 +165,37 @@ function render(){
   refreshCartLinks(cart);
 }
 
-loadMenuData().then(()=>{
-  refreshHeader();
+refreshHeader();
+
+if (typeof DISHES !== 'undefined' && DISHES.length > 0) {
   render();
-});
+}
+
+if (typeof loadMenuData === 'function') {
+  loadMenuData().then(()=>{
+    refreshHeader();
+    render();
+  }).catch(()=>{
+    render();
+  });
+} else {
+  render();
+}
+
+/* DARK MODE LOGIKASI */
+const themeToggle = document.getElementById("themeToggle");
+if (themeToggle) {
+  if (document.body.classList.contains("dark")) {
+    themeToggle.textContent = "☀️";
+  }
+
+  themeToggle.addEventListener("click", function () {
+    document.body.classList.toggle("dark");
+    const isDark = document.body.classList.contains("dark");
+    themeToggle.textContent = isDark ? "☀️" : "🌙";
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+  });
+}
 </script>
 </body>
 </html>

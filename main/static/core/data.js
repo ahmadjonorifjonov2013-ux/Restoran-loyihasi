@@ -1,8 +1,8 @@
-// Taomlar va kategoriyalar uchun global massivlar
-let CATS = [];
-let DISHES = [];
+// Taomlar va kategoriyalar uchun global massivlar (dastlab keshdan o'qiladi)
+let CATS = JSON.parse(localStorage.getItem('RESTO_CATS') || '[]');
+let DISHES = JSON.parse(localStorage.getItem('RESTO_DISHES') || '[]');
 
-// Backend Serializer reponzidagi kalit so'zlarga mos keluvchi yordamchi obyekt
+// Backend serializerdagi kalit so'zlarga mos keluvchi yordamchi obyekt
 const field = {
   catId: c => c.id,
   catName: c => c.nom || c.name || c.title,
@@ -19,6 +19,11 @@ function fmt(num) {
   return Number(num || 0).toLocaleString('ru-RU');
 }
 
+// ID bo'yicha taomni topish yordamchisi (cart.js va savat.html uchun kerak)
+function findDish(id) {
+  return DISHES.find(d => String(field.dishId(d)) === String(id));
+}
+
 // Rasm bo'lmagan taomlar uchun standart SVG tasvir
 function plateSVG(id) {
   return `
@@ -30,28 +35,25 @@ function plateSVG(id) {
   `;
 }
 
-// Backend API'dan ma'lumotlarni yuklab olish funksiyasi (/api/ prefiksiz)
+// Backend API'dan ma'lumotlarni yuklab olish va KESHGA saqlash.
+// Xatolik bo'lsa shu yerda ushlanmaydi — chaqiruvchi (.then/.catch) o'zi
+// hal qiladi, shunda menyu.html/savat.html foydalanuvchiga xabar bera oladi.
 async function loadMenuData() {
-  try {
-    const [catRes, dishRes] = await Promise.all([
-      fetch('/categories/'),
-      fetch('/dishes/')
-    ]);
+  const [resCats, resDishes] = await Promise.all([
+    fetch('/categories/'),
+    fetch('/dishes/')
+  ]);
 
-    if (!catRes.ok || !dishRes.ok) {
-      throw new Error(`Server xatosi: Kategoriyalar statusi (${catRes.status}), Taomlar statusi (${dishRes.status})`);
-    }
-
-    const catData = await catRes.json();
-    const dishData = await dishRes.json();
-
-    // Agar Django REST Framework pagination ishlatsa (results) yoki to'g'ridan-to'g me'yoriy list qaytsa:
-    CATS = Array.isArray(catData) ? catData : (catData.results || []);
-    DISHES = Array.isArray(dishData) ? dishData : (dishData.results || []);
-
-  } catch (err) {
-    console.error("Menyu ma'lumotlarini yuklashda xatolik yuz berdi:", err);
-    CATS = [];
-    DISHES = [];
+  if (!resCats.ok || !resDishes.ok) {
+    throw new Error(`Server xatosi: kategoriyalar (${resCats.status}), taomlar (${resDishes.status})`);
   }
+
+  const catData = await resCats.json();
+  const dishData = await resDishes.json();
+
+  CATS = Array.isArray(catData) ? catData : (catData.results || []);
+  DISHES = Array.isArray(dishData) ? dishData : (dishData.results || []);
+
+  localStorage.setItem('RESTO_CATS', JSON.stringify(CATS));
+  localStorage.setItem('RESTO_DISHES', JSON.stringify(DISHES));
 }

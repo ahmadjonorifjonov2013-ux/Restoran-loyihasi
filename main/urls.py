@@ -1,9 +1,10 @@
-from django.urls import path
+from django.urls import path , include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .views import (
     CustomerViewSet, CategoryViewSet, DishViewSet,
     CartView, OrderViewSet, KitchenQueueView, DailyReportView,
+    create_order,
     index_view, menu_view, cart_view, checkout_view, order_success_view, about_view,
 )
 
@@ -14,6 +15,8 @@ urlpatterns = [
     path('buyurtma/', checkout_view, name='checkout'),
     path('tasdiq/', order_success_view, name='order_success'),
     path('biz-haqimizda/', about_view, name='about'),
+
+    path('telegram-order/', create_order, name='telegram-order'),
 
     path('categories/', CategoryViewSet.as_view({'get': 'list', 'post': 'create'}), name='category-list'),
     path('categories/<int:pk>/', CategoryViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name='category-detail'),
@@ -35,5 +38,8 @@ urlpatterns = [
 
     path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path("silk/", include("silk.urls", namespace="silk")),
 ]
+
+
 

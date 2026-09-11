@@ -1,24 +1,119 @@
-import datetime
 import uuid
 from decimal import Decimal
 from django.db import transaction
+
+from django.db.models import Sum
+from django.shortcuts import render
 from django.utils import timezone
-from django.db.models import Sum, Count
+from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework import viewsets, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 
 from .models import Customer, Category, Dish, Cart, CartItem, Order, OrderItem, OrderStatusLog
 from .serializers import (
     CustomerSerializer, CategorySerializer, DishSerializer, 
-    CartSerializer, CartItemSerializer, OrderSerializer
+    CartSerializer, OrderSerializer
 )
 from .permissions import IsAdminUserOrReadOnly, IsAdminRole, IsOshpazOrAdmin
 from .filters import DishFilter, OrderFilter
+
+from django.http import JsonResponse
+from rest_framework.decorators import api_view
+from .services import send_telegram_order
+
+
+@api_view(['POST'])
+def create_order(request):
+    data = request.data
+    telephone = str(data.get('phone') or '').strip()
+    ism = str(data.get('customer_name') or '').strip()
+    if not telephone or not ism:
+        return JsonResponse({'error': 'Ism va telefon raqam kiritilishi shart'}, status=400)
+
+    customer, _ = Customer.objects.get_or_create(
+        telefon=telephone, defaults={'ism': ism}
+    )
+    if customer.ism != ism:
+        customer.ism = ism
+    customer.telefon = telephone
+    customer.save()
+
+    delivery_type = data.get('delivery_type')
+    if delivery_type == 'delivery':
+        yt = 'manzil'
+    elif delivery_type == 'stol':
+        yt = 'stol'
+    else:
+        yt = 'olib_kelish'
+
+    items_data = data.get('items') or []
+    if not items_data:
+        return JsonResponse({'error': "Savat bo'sh"}, status=400)
+
+    try:
+        with transaction.atomic():
+            order = Order.objects.create(
+                raqam=f"B-{timezone.now():%Y%m%d}-{str(uuid.uuid4().int)[:4]}",
+                mijoz=customer,
+                holat='yangi',
+                yetkazish_turi=yt,
+                stol_raqami=data.get('stol_raqami') or None,
+                manzil=data.get('address') or '',
+                telefon=telephone,
+                izoh=data.get('comment') or '',
+                yetkazish_narxi=Decimal(str(data.get('delivery_fee') or 0)),
+            )
+            jami = Decimal('0')
+            bot_items = []
+            for it in items_data:
+                dish_id = it.get('dish')
+                soni = int(it.get('quantity') or 1)
+                dish = Dish.objects.filter(id=dish_id).first()
+                if not dish:
+                    continue
+                summa = dish.narx * soni
+                OrderItem.objects.create(
+                    buyurtma=order, taom=dish, taom_nomi=dish.nom,
+                    narx=dish.narx, miqdor=soni, summa=summa
+                )
+                jami += summa
+                bot_items.append({
+                    'taom_nomi': dish.nom,
+                    'miqdor': soni,
+                    'narx': dish.narx,
+                    'summa': summa,
+                })
+            order.jami_summa = jami + order.yetkazish_narxi
+            order.save()
+            OrderStatusLog.objects.create(
+                buyurtma=order, eski_holat='-', yangi_holat='yangi', kim=None
+            )
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+    send_telegram_order({
+        'raqam': order.raqam,
+        'customer_name': customer.ism,
+        'phone': telephone,
+        'delivery_type': yt,
+        'address': data.get('address') or '',
+        'comment': data.get('comment') or '',
+        'items': bot_items,
+        'jami_summa': order.jami_summa,
+    })
+
+    return JsonResponse({
+        'status': 'ok',
+        'order_id': order.id,
+        'raqam': order.raqam,
+    })
+
+def _is_admin(user):
+    return user and (user.is_superuser or user.groups.filter(name='Administrator').exists())
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
@@ -45,7 +140,7 @@ class CustomerViewSet(viewsets.ModelViewSet):
             customer.save()
 
         serializer = self.get_serializer(customer)
-        return Response(serializer.data, status=status.HTTP_200_OK if not created else status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -54,7 +149,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUserOrReadOnly]
 
     def get_queryset(self):
-        if self.request.user and (self.request.user.is_superuser or self.request.user.groups.filter(name='Administrator').exists()):
+        if _is_admin(self.request.user):
             return Category.objects.all()
         return Category.objects.filter(faolmi=True)
 
@@ -66,10 +161,10 @@ class DishViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = DishFilter
     search_fields = ['nom', 'tavsif']
-    ordering_fields = ['narx', 'tartib', 'yaratilgan']
+    ordering_fields = ['narx', 'yaratilgan']
 
     def get_queryset(self):
-        if self.request.user and (self.request.user.is_superuser or self.request.user.groups.filter(name='Administrator').exists()):
+        if _is_admin(self.request.user):
             return Dish.objects.all()
         return Dish.objects.filter(faolmi=True, kategoriya__faolmi=True)
 
@@ -85,13 +180,10 @@ class CartView(APIView):
             return None, "Mijoz topilmadi"
 
     def get(self, request):
-        telegram_id = request.query_params.get('telegram_id')
-        cart, error = self.get_cart(telegram_id)
+        cart, error = self.get_cart(request.query_params.get('telegram_id'))
         if error:
             return Response({'error': error}, status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = CartSerializer(cart)
-        return Response(serializer.data)
+        return Response(CartSerializer(cart).data)
 
     def post(self, request):
         telegram_id = request.data.get('telegram_id')
@@ -101,35 +193,32 @@ class CartView(APIView):
         cart, error = self.get_cart(telegram_id)
         if error:
             return Response({'error': error}, status=status.HTTP_404_NOT_FOUND)
+
         try:
             dish = Dish.objects.get(id=dish_id)
         except Dish.DoesNotExist:
             return Response({'error': "Taom topilmadi"}, status=status.HTTP_404_NOT_FOUND)
+
         if not dish.faolmi or not dish.kategoriya.faolmi:
             return Response({'error': "Ushbu taom hozirda mavjud emas"}, status=status.HTTP_400_BAD_REQUEST)
+
         cart_item, created = CartItem.objects.get_or_create(savat=cart, taom=dish)
-        if not created:
-            cart_item.miqdor += miqdor
+        if created:
+            cart_item.miqdor = min(miqdor, 50)
         else:
-            cart_item.miqdor = miqdor
-        if cart_item.miqdor > 50:
-            cart_item.miqdor = 50
+            cart_item.miqdor = min(cart_item.miqdor + miqdor, 50)
         cart_item.save()
 
         return Response(CartSerializer(cart).data, status=status.HTTP_200_OK)
 
     def delete(self, request):
-        """Savatdan taomni o'chirish yoki miqdorini kamaytirish"""
-        telegram_id = request.data.get('telegram_id')
-        dish_id = request.data.get('dish_id')
-        to_lower = request.data.get('to_lower', False)
-
-        cart, error = self.get_cart(telegram_id)
+        cart, error = self.get_cart(request.data.get('telegram_id'))
         if error:
             return Response({'error': error}, status=status.HTTP_404_NOT_FOUND)
+
         try:
-            item = CartItem.objects.get(savat=cart, taom_id=dish_id)
-            if to_lower and item.miqdor > 1:
+            item = CartItem.objects.get(savat=cart, taom_id=request.data.get('dish_id'))
+            if request.data.get('to_lower', False) and item.miqdor > 1:
                 item.miqdor -= 1
                 item.save()
             else:
@@ -146,9 +235,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     filterset_class = OrderFilter
     ordering_fields = ['yaratilgan', 'id']
 
-    @transaction.atomic
     def create(self, request, *args, **kwargs):
-        """Savatdan Buyurtma Yaratish va taom narxlari nusxasini yozish"""
         telegram_id = request.data.get('telegram_id')
         try:
             customer = Customer.objects.get(telegram_id=telegram_id)
@@ -219,9 +306,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['patch'], permission_classes=[IsOshpazOrAdmin])
-    @transaction.atomic
     def change_status(self, request, pk=None):
-        """Oshpaz va Admin uchun buyurtma holatini bosqichma-bosqich o'zgartirish"""
         order = self.get_object()
         yangi_holat = request.data.get('holat')
         bekor_sababi = request.data.get('bekor_sababi', '')
@@ -254,7 +339,6 @@ class OrderViewSet(viewsets.ModelViewSet):
         order.holat = yangi_holat
         order.save()
 
-        # Log yaratish
         OrderStatusLog.objects.create(
             buyurtma=order,
             eski_holat=eski_holat,
@@ -272,6 +356,7 @@ class KitchenQueueView(generics.ListAPIView):
     def get_queryset(self):
         return Order.objects.filter(holat__in=['yangi', 'tayyorlanmoqda']).order_by('yaratilgan')
 
+
 class DailyReportView(APIView):
     permission_classes = [IsAdminRole]
 
@@ -284,9 +369,7 @@ class DailyReportView(APIView):
         )
 
         jami_savdo = buyurtmalar.aggregate(Sum('jami_summa'))['jami_summa__sum'] or Decimal('0.00')
-        buyurtmalar_soni = buyurtmalar.count()
 
-        # Eng ko'p sotilgan taomlar
         top_taomlar = OrderItem.objects.filter(
             buyurtma__in=buyurtmalar
         ).values('taom_nomi').annotate(
@@ -296,35 +379,31 @@ class DailyReportView(APIView):
 
         return Response({
             'sana': sana,
-            'muvaffaqiyatli_buyurtmalar_soni': buyurtmalar_soni,
+            'muvaffaqiyatli_buyurtmalar_soni': buyurtmalar.count(),
             'jami_tushum': jami_savdo,
             'top_taomlar': top_taomlar
         })
 
-from django.shortcuts import render
- 
- 
+
 def index_view(request):
     return render(request, 'index.html')
- 
- 
+
+
 def menu_view(request):
     return render(request, 'menu.html')
- 
- 
+
+
 def cart_view(request):
     return render(request, 'savat.html')
- 
- 
+
+
 def checkout_view(request):
     return render(request, 'order.html')
- 
- 
+
+
 def order_success_view(request):
     return render(request, 'ratification.html')
- 
- 
+
+
 def about_view(request):
     return render(request, 'about.html')
- 
-

@@ -10,7 +10,13 @@ User = get_user_model()
 
 class Customer(models.Model):
     id = models.BigAutoField(primary_key=True)
-    telegram_id = models.BigIntegerField(unique=True, db_index=True, verbose_name="Telegram ID")
+    telegram_id = models.BigIntegerField(
+        unique=True,
+        null=True,
+        blank=True,
+        db_index=True,
+        verbose_name="Telegram ID"
+    )
     ism = models.CharField(max_length=100, verbose_name="Ism")
     username = models.CharField(max_length=64, blank=True, verbose_name="Username")
     telefon = models.CharField(max_length=20, blank=True, verbose_name="Telefon raqam")
@@ -44,8 +50,8 @@ class Category(models.Model):
 
 class Dish(models.Model):
     kategoriya = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="Taomlar")
-    nom = models.CharField(max_length=200 , verbose_name="Taom nomi")
-    tavsif= models.TextField(blank=True, verbose_name="Tavsi")
+    nom = models.CharField(max_length=200, verbose_name="Taom nomi")
+    tavsif = models.TextField(blank=True, verbose_name="Tavsif")
     narx = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
@@ -53,11 +59,10 @@ class Dish(models.Model):
         verbose_name="Narx (so'm)"
     )
     rasm = models.ImageField(upload_to="Taomlar/", null=True, blank=True, verbose_name="Rasm")
-    tayyorlash_vaqti = models.PositiveSmallIntegerField(default=15,verbose_name="Taom tayyorlash vaqti(daq)")
+    tayyorlash_vaqti = models.PositiveSmallIntegerField(default=15, verbose_name="Taom tayyorlash vaqti (daq)")
     faolmi = models.BooleanField(default=True, verbose_name="Faolmi")
     yaratilgan = models.DateTimeField(auto_now_add=True)
-    yangilasgan = models.DateTimeField(auto_now=True)
-    tayyorlanish_vaqti = models.IntegerField(default=15)
+    yangilangan = models.DateTimeField(auto_now=True)
 
 
     class Meta:
@@ -119,20 +124,21 @@ class Order (models.Model):
     YETKAZISH_TURI = (
         ('stol', 'Stolda'),
         ('manzil', 'Yetkazib berish'),
+        ('olib_kelish', 'Olib kelish'),
     )
     raqam = models.CharField(max_length=16, unique=True, db_index=True)
     mijoz = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    holat = models.CharField(max_length=20, choices=HOLATLAR,default="Yangi", db_index=True)
-    yetkazish_turi = models.CharField(max_length=10, choices=YETKAZISH_TURI, verbose_name="Yetgazish turi")
-    stol_raqami = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name="Stol raaqami")
+    holat = models.CharField(max_length=20, choices=HOLATLAR, default='yangi', db_index=True)
+    yetkazish_turi = models.CharField(max_length=12, choices=YETKAZISH_TURI, verbose_name="Yetkazish turi")
+    stol_raqami = models.PositiveSmallIntegerField(null=True, blank=True, verbose_name="Stol raqami")
     manzil = models.CharField(max_length=300, blank=True, verbose_name="Manzil")
-    telefon = models.CharField(max_length=20,verbose_name="Telefon")
+    telefon = models.CharField(max_length=20, verbose_name="Telefon")
     izoh = models.TextField(blank=True, verbose_name="Izoh")
-    jami_summa = models.DecimalField(max_digits=12 , decimal_places=2, default=0, verbose_name="Jami summa")
-    yetkazish_narxi = models.DecimalField(max_digits=10, decimal_places=2, default=0 , verbose_name="Yetkazish narxi")
+    jami_summa = models.DecimalField(max_digits=12, decimal_places=2, default=0, verbose_name="Jami summa")
+    yetkazish_narxi = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Yetkazish narxi")
     yaratilgan = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name="Yaratilgan vaqti")
-    tayyor_vaqti = models.DateTimeField(null=True, blank=True, verbose_name="Tayyor vaqti ")
-    yopingan_vaqti = models.DateTimeField(null=True,blank=True, verbose_name="Yopilgan vaqati")
+    tayyor_vaqti = models.DateTimeField(null=True, blank=True, verbose_name="Tayyor vaqti")
+    yopilgan_vaqti = models.DateTimeField(null=True, blank=True, verbose_name="Yopilgan vaqti")
     bekor_sababi = models.CharField(max_length=300, blank=True, verbose_name="Bekor sababi")
 
 

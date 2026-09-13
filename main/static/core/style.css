@@ -370,6 +370,101 @@ body.dark .site-header {
 }
 
 
+/* =========================================================
+   MOBILE NAVIGATION BURGER
+   ========================================================= */
+
+.nav-burger {
+
+  display: none;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 5px;
+
+  width: 40px;
+
+  height: 40px;
+
+  flex: none;
+
+  padding: 0;
+
+  background: var(--night-2);
+
+  border: 1px solid var(--line-strong);
+
+  border-radius: 50%;
+
+  transition:
+    transform .25s ease,
+    border-color .25s ease,
+    background .35s ease;
+
+}
+
+
+.nav-burger span {
+
+  display: block;
+
+  width: 17px;
+
+  height: 2px;
+
+  border-radius: 2px;
+
+  background: var(--ivory);
+
+  transition:
+    transform .25s ease,
+    opacity .2s ease,
+    background .35s ease;
+
+}
+
+
+.nav-burger:hover {
+
+  border-color: var(--gold);
+
+  transform: rotate(5deg);
+
+}
+
+
+.nav-burger:active {
+
+  transform: scale(.90);
+
+}
+
+
+.site-header.nav-open .nav-burger span:nth-child(1) {
+
+  transform: translateY(7px) rotate(45deg);
+
+}
+
+
+.site-header.nav-open .nav-burger span:nth-child(2) {
+
+  opacity: 0;
+
+}
+
+
+.site-header.nav-open .nav-burger span:nth-child(3) {
+
+  transform: translateY(-7px) rotate(-45deg);
+
+}
+
+
 #themeIcon {
 
   line-height: 1;
@@ -1680,9 +1775,14 @@ footer {
   }
 
 
-  .header-nav {
+  .nav-burger {
 
     display: flex;
+
+  }
+
+
+  .header-nav {
 
     order: 3;
 
@@ -1690,28 +1790,38 @@ footer {
 
     margin-left: 0;
 
-    margin-top: 14px;
+    display: none;
 
-    padding-top: 12px;
+    flex-direction: column;
 
-    border-top: 1px solid var(--line);
+  }
 
-    justify-content: space-between;
 
-    gap: 0;
+  .site-header.nav-open .header-nav {
+
+    display: flex;
 
   }
 
 
   .header-nav a {
 
-    flex: 1;
+    font-size: 1rem;
 
-    text-align: center;
+    padding: 15px 4px;
 
-    font-size: .95rem;
+    border-bottom: 1px solid var(--line);
 
-    padding: 6px 2px;
+    color: var(--muted);
+
+  }
+
+
+  .header-nav a.current {
+
+    color: var(--ivory);
+
+    border-bottom: 2px solid var(--gold);
 
   }
 
@@ -1797,9 +1907,129 @@ footer {
 
   .cart-btn {
 
-    padding-left: 10px;
+    padding: 0;
 
-    padding-right: 12px;
+    width: 40px;
+
+    height: 40px;
+
+    border-radius: 50%;
+
+    justify-content: center;
+
+  }
+
+
+  .cart-label {
+
+    display: none;
+
+  }
+
+
+  .section {
+
+    padding: 44px 0;
+
+  }
+
+
+  .hero {
+
+    padding: 54px 0 46px;
+
+  }
+
+
+  .hero h1 {
+
+    font-size: 2.35rem;
+
+  }
+
+
+  .hero p.lede {
+
+    font-size: 1rem;
+
+  }
+
+
+  .hero-strip {
+
+    margin-top: 40px;
+
+  }
+
+
+  .hero-strip-item {
+
+    padding: 16px 4px 0;
+
+  }
+
+
+  .menu-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+  }
+
+
+  .menu-row {
+
+    background: var(--night-2);
+
+    border: 1px solid var(--line);
+
+    border-radius: 12px;
+
+    padding: 14px;
+
+  }
+
+
+  .menu-thumb {
+
+    border-radius: 10px;
+
+  }
+
+
+  .add-btn {
+
+    flex: 1;
+
+    justify-content: center;
+
+    padding: 12px 16px;
+
+  }
+
+
+  .cat-tabs {
+
+    gap: 20px;
+
+  }
+
+
+  .cat-tab {
+
+    font-size: .92rem;
+
+    padding: 10px 4px 12px;
+
+  }
+
+
+  footer {
+
+    padding: 36px 0;
 
   }
 
@@ -1857,14 +2087,14 @@ footer {
 
   .hero {
 
-    padding-top: 65px;
+    padding: 52px 0 42px;
 
   }
 
 
   .hero h1 {
 
-    font-size: 2.5rem;
+    font-size: 2.3rem;
 
   }
 
@@ -1911,8 +2141,10 @@ footer {
   }
 
 
-  .btn-primary,
-  .btn-ghost {
+  .hero-actions .btn-primary,
+  .hero-actions .btn-ghost {
+
+    width: 100%;
 
     text-align: center;
 
@@ -1929,7 +2161,11 @@ footer {
 
   .receipt {
 
-    padding: 26px 18px;
+    padding: 24px 16px;
+
+    border-left: none;
+
+    border-right: none;
 
   }
 

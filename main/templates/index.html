@@ -110,13 +110,27 @@
 
         </svg>
 
-        Savat
+        <span class="cart-label">Savat</span>
 
         <span class="cart-count" id="cartCount">
           0
         </span>
 
       </a>
+
+      <button
+        class="nav-burger"
+        id="navBurger"
+        type="button"
+        aria-label="Menyu">
+
+        <span></span>
+
+        <span></span>
+
+        <span></span>
+
+      </button>
 
     </div>
 
@@ -360,6 +374,23 @@
   renderCartBadge(cart);
 
   refreshCartLinks(cart);
+
+
+  /* MOBILE NAV */
+
+  const navBurger = document.getElementById("navBurger");
+
+  const siteHeader = document.querySelector(".site-header");
+
+  if (navBurger && siteHeader) {
+
+    navBurger.addEventListener("click", function () {
+
+      siteHeader.classList.toggle("nav-open");
+
+    });
+
+  }
 
 
   /* DARK MODE */

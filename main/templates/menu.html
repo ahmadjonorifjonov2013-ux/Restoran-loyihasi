@@ -37,9 +37,10 @@
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Dark mode">🌙</button>
       <a class="cart-btn" id="cartLink" data-cart-link="{% url 'cart' %}" href="{% url 'cart' %}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="21" r="1.4"/><circle cx="17" cy="21" r="1.4"/></svg>
-        Savat
+        <span class="cart-label">Savat</span>
         <span class="cart-count" id="cartCount">0</span>
       </a>
+      <button class="nav-burger" id="navBurger" type="button" aria-label="Menyu"><span></span><span></span><span></span></button>
     </div>
   </div>
 </header>
@@ -162,6 +163,12 @@ loadMenuData().then(() => {
     `<div class="empty-note">Menyuni yuklab bo'lmadi. Birozdan so'ng qayta urinib ko'ring.</div>`;
   refreshHeader();
 });
+
+const navBurger = document.getElementById("navBurger");
+const siteHeader = document.querySelector(".site-header");
+if (navBurger && siteHeader) {
+  navBurger.addEventListener("click", () => siteHeader.classList.toggle("nav-open"));
+}
 
 const themeToggle = document.getElementById("themeToggle");
 if (document.body.classList.contains("dark")) {

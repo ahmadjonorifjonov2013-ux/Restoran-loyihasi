@@ -1671,9 +1671,72 @@ footer {
 
 @media (max-width: 760px) {
 
+  .header-row {
+
+    flex-wrap: wrap;
+
+    padding: 12px 0;
+
+  }
+
+
   .header-nav {
 
-    display: none;
+    display: flex;
+
+    order: 3;
+
+    flex: 1 1 100%;
+
+    margin-left: 0;
+
+    margin-top: 14px;
+
+    padding-top: 12px;
+
+    border-top: 1px solid var(--line);
+
+    justify-content: space-between;
+
+    gap: 0;
+
+  }
+
+
+  .header-nav a {
+
+    flex: 1;
+
+    text-align: center;
+
+    font-size: .95rem;
+
+    padding: 6px 2px;
+
+  }
+
+
+  .header-actions {
+
+    order: 2;
+
+  }
+
+
+  .qty-btn {
+
+    width: 32px;
+
+    height: 32px;
+
+    font-size: 1rem;
+
+  }
+
+
+  .toggle-opt {
+
+    padding: 13px 8px;
 
   }
 
@@ -1813,6 +1876,34 @@ footer {
   }
 
 
+  .cat-tabs {
+
+    gap: 18px;
+
+  }
+
+
+  .cat-tab {
+
+    font-size: .9rem;
+
+  }
+
+
+  .menu-row {
+
+    gap: 14px;
+
+  }
+
+
+  .menu-row .no {
+
+    display: none;
+
+  }
+
+
   .hero-actions {
 
     flex-direction: column;
@@ -1824,6 +1915,77 @@ footer {
   .btn-ghost {
 
     text-align: center;
+
+  }
+
+}
+
+
+/* =========================================================
+   PHONE — RECEIPT, MENU, FORM FINETUNING
+   ========================================================= */
+
+@media (max-width: 560px) {
+
+  .receipt {
+
+    padding: 26px 18px;
+
+  }
+
+
+  .receipt-line {
+
+    flex-wrap: wrap;
+
+  }
+
+
+  .receipt-line > .rl-name {
+
+    min-width: 0;
+
+  }
+
+
+  .receipt-line > .rl-total {
+
+    width: 100%;
+
+    text-align: right;
+
+  }
+
+
+  .qty-row {
+
+    flex-wrap: wrap;
+
+  }
+
+
+  .menu-thumb {
+
+    width: 64px;
+
+    height: 64px;
+
+  }
+
+
+  .add-btn {
+
+    padding-top: 10px;
+
+    padding-bottom: 10px;
+
+  }
+
+
+  .field input,
+  .field textarea {
+
+    font-size: 16px;
 
   }
 

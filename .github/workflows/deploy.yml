@@ -3,16 +3,13 @@ name: Deploy Restoran Project to VPS
 on:
   push:
     branches:
-      - main  # Если в вашем репозитории используется ветка master, замените main на master
+      - main  # Agar git branch'ingiz nomi master bo'lsa, master deb yozing
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-out: ubuntu-latest
 
     steps:
-      - name: Checkout repository code
-        uses: actions/checkout@v4
-
       - name: Executing remote SSH commands to deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -21,24 +18,11 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            set -e  # Если любая команда завершится ошибкой, скрипт сразу остановится
-            
-            # 1. Переход в папку проекта на VPS
-            cd /var/www/ahmadjon.sharqsoft.uz
-
-            # 2. Получение свежего кода из GitHub
-            git fetch origin main
-            git reset --hard origin/main
-
-            # 3. Активация виртуального окружения и установка зависимостей
+            cd /var/www/Restoran-loyihasi
+            git pull origin main
             source venv/bin/activate
-            pip install --upgrade pip
             pip install -r requirements.txt
-
-            # 4. Применение миграций и сборка статических файлов Django
-            python manage.py migrate --noinput
+            python manage.py migrate
             python manage.py collectstatic --noinput
-
-            # 5. Перезапуск служб Gunicorn и Nginx
-            sudo systemctl restart gunicorn
-            sudo systemctl restart nginx
+            systemctl restart gunicorn
+            systemctl restart nginx

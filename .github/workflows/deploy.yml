@@ -1,0 +1,37 @@
+name: Deploy Restoran Project to VPS
+
+on:
+  push:
+    branches:
+      - main  # Agar branch ingiz nomi 'master' bo'lsa, master deb yozing
+
+jobs:
+  deploy:
+    runs-out: ubuntu-latest
+
+    steps:
+      - name: Deploying to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            # VPS dagi loyiha papkasiga o'tish
+            cd /var/www/ahmadjon.sharqsoft.uz
+
+            # Yangi kodni tortib olish
+            git pull origin main
+
+            # Virtualenv va paketlarni yangilash
+            source venv/bin/activate
+            pip install -r requirements.txt
+
+            # Migratsiya va static fayllar
+            python manage.py migrate
+            python manage.py collectstatic --noinput
+
+            # Gunicorn va Nginx'ni qayta yoqish
+            sudo systemctl restart gunicorn
+            sudo systemctl restart nginx

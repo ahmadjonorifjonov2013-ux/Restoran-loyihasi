@@ -3,11 +3,12 @@ name: Deploy Restoran Project to VPS
 on:
   push:
     branches:
-      - main  # Agar git branch'ingiz nomi master bo'lsa, master deb yozing
+      - main
+      - master
 
 jobs:
   deploy:
-    runs-out: ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Executing remote SSH commands to deploy
@@ -19,10 +20,10 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             cd /var/www/Restoran-loyihasi
-            git pull origin main
+            git pull origin main || git pull origin master
             source venv/bin/activate
             pip install -r requirements.txt
             python manage.py migrate
             python manage.py collectstatic --noinput
-            systemctl restart gunicorn
-            systemctl restart nginx
+            sudo systemctl restart gunicorn
+            sudo systemctl restart nginx

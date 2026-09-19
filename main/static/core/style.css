@@ -1422,3 +1422,364 @@ body.dark .to-top { background: var(--gold); color: #221a11; }
   .theme-toggle, .nav-burger { width: 38px; height: 38px; }
   .cart-btn { width: 38px; height: 38px; }
 }
+
+
+/* =========================================================
+   22. PREMIUM 2.0 — YUKSAK HASISLIK (YANGI QATLAM)
+   ---------------------------------------------------------
+   Yuqori e'lon paneli, hero bug'i, gradient aksentlar,
+   bosqich indikatori, iqtibos va CTA tasmalari, aloqa FAB,
+   kengaytirilgan footer.
+   ========================================================= */
+
+/* ---------- E'LON PANELI (topbar) ---------- */
+
+.topbar {
+  position: relative;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 9px 22px;
+  background: linear-gradient(90deg, #b03a10, var(--ember) 45%, #b03a10);
+  color: #fff;
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-align: center;
+}
+body.dark .topbar {
+  background: linear-gradient(90deg, #7a2a0c, var(--ember) 45%, #7a2a0c);
+}
+.topbar .top-item { display: inline-flex; align-items: center; gap: 7px; }
+.topbar .top-item svg { width: 14px; height: 14px; flex: none; }
+.topbar .top-sep { opacity: .45; font-weight: 600; }
+.topbar a { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+.topbar strong { color: var(--gold-soft); }
+body.dark .topbar strong { color: var(--gold-soft); }
+
+
+/* ---------- GRADIENT AKSENT (sarlavhalar) ---------- */
+
+.hero h1 em,
+.about-hero h1 em {
+  font-style: italic;
+  background: linear-gradient(120deg, var(--ember), var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: var(--ember);
+}
+
+.eyebrow,
+.hero-eyebrow {
+  position: relative;
+}
+.eyebrow { line-height: 1.4; }
+
+
+/* ---------- HERO BUG'I (steam) ---------- */
+
+.steam {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+  pointer-events: none;
+}
+.steam i {
+  display: block;
+  width: 7px;
+  height: 26px;
+  border-radius: 99px;
+  background: radial-gradient(circle, var(--gold-soft), transparent 72%);
+  opacity: 0;
+  filter: blur(2px);
+  animation: steam-rise 3.4s ease-out infinite;
+}
+.steam i:nth-child(2) { margin-top: 6px; animation-delay: 1.15s; }
+.steam i:nth-child(3) { margin-top: 2px; animation-delay: 2.3s; }
+
+@keyframes steam-rise {
+  0%   { transform: translateY(14px) scaleY(.55); opacity: 0; }
+  35%  { opacity: .85; }
+  100% { transform: translateY(-30px) scaleY(1.35); opacity: 0; }
+}
+
+
+/* ---------- BOSQICH INDIKATORI (checkout) ---------- */
+
+.steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.step {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .8rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.step .dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--bg-3);
+  border: 1px solid var(--line-2);
+  font-size: .74rem;
+  font-weight: 800;
+  transition: all .3s ease;
+}
+.step.on .dot { background: var(--ink); color: var(--bg); border-color: var(--ink); box-shadow: 0 8px 18px -10px rgba(34, 26, 17, .55); }
+body.dark .step.on .dot { background: var(--gold); color: #221a11; border-color: var(--gold); }
+.step.done .dot { background: var(--teal); color: #fff; border-color: var(--teal); }
+.step.done { color: var(--teal); }
+.step-track { width: 40px; height: 1.5px; background: var(--line-2); border-radius: 99px; }
+.step-track.on { background: var(--gold); }
+
+
+/* ---------- IQTIBOS TASMASI ---------- */
+
+.quote-band {
+  position: relative;
+  padding: 58px 0 62px;
+  background:
+    radial-gradient(640px 320px at 88% 8%, rgba(210, 74, 31, .08), transparent 60%),
+    radial-gradient(560px 320px at 6% 96%, rgba(193, 146, 44, .10), transparent 60%),
+    var(--bg-2);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+}
+.quote-band .mark {
+  position: absolute;
+  font-family: var(--serif);
+  font-size: 9rem;
+  line-height: 1;
+  color: var(--gold);
+  opacity: .14;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  user-select: none;
+}
+.quote-band .q {
+  position: relative;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1.45rem, 3.4vw, 2.25rem);
+  font-weight: 500;
+  line-height: 1.32;
+  text-align: center;
+  max-width: 30ch;
+  margin: 0 auto;
+}
+.quote-band .q em { color: var(--ember); }
+.quote-band .attr {
+  text-align: center;
+  margin-top: 18px;
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.quote-band .attr b { color: var(--gold-deep); }
+body.dark .quote-band .attr b { color: var(--gold); }
+
+
+/* ---------- CTA TASMASI ---------- */
+
+.cta-band {
+  position: relative;
+  padding: 78px 0;
+  margin-top: 86px;
+  text-align: center;
+  overflow: hidden;
+  background:
+    radial-gradient(760px 460px at 50% -18%, rgba(193, 146, 44, .16), transparent 62%),
+    var(--ink);
+  color: var(--bg);
+}
+body.dark .cta-band {
+  background:
+    radial-gradient(760px 460px at 50% -18%, rgba(223, 180, 90, .16), transparent 62%),
+    #17110a;
+}
+.cta-band::before,
+.cta-band::after {
+  content: "✦";
+  position: absolute;
+  color: var(--gold);
+  opacity: .35;
+}
+.cta-band::before { left: 7%; top: 26px; font-size: 1.6rem; }
+.cta-band::after { right: 9%; bottom: 22px; font-size: 1.2rem; }
+.cta-band h2 { color: var(--bg); font-size: clamp(1.8rem, 3.8vw, 2.9rem); max-width: 22ch; margin: 0 auto; }
+.cta-band h2 em { color: var(--gold); font-style: italic; }
+.cta-band .lede { color: rgba(243, 234, 215, .72); margin: 14px auto 0; max-width: 52ch; }
+.cta-band .cta-actions { margin-top: 32px; display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 999px;
+  padding: 15px 30px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-deep));
+  color: #221a11;
+  font-size: .95rem;
+  font-weight: 800;
+  box-shadow: 0 14px 34px -14px rgba(193, 146, 44, .75);
+  transition: transform .25s ease, box-shadow .3s ease;
+}
+.btn-gold:hover { transform: translateY(-3px); box-shadow: 0 20px 40px -16px rgba(193, 146, 44, .85); }
+.cta-band .btn-ghost { border-color: rgba(243, 234, 215, .35); color: var(--bg); }
+.cta-band .btn-ghost:hover { border-color: var(--gold); background: rgba(243, 234, 215, .08); }
+
+
+/* ---------- ALOQA FAB (suzuvchi tugma) ---------- */
+
+.fab {
+  position: fixed;
+  right: 24px;
+  bottom: 84px;
+  z-index: 85;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--ember), var(--ember-deep));
+  color: #fff;
+  box-shadow: 0 16px 34px -12px rgba(210, 74, 31, .7);
+  transition: transform .3s ease, box-shadow .3s ease;
+  animation: fab-in .7s cubic-bezier(.34, 1.56, .64, 1) .4s both;
+}
+.fab svg { width: 24px; height: 24px; }
+.fab:hover { transform: translateY(-4px) scale(1.05); box-shadow: 0 22px 42px -14px rgba(210, 74, 31, .85); }
+.fab::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--ember);
+  opacity: .5;
+  animation: fab-pulse 2.4s ease-out infinite;
+}
+.fab .fab-tip {
+  position: absolute;
+  right: 66px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 6px 13px;
+  border-radius: 999px;
+  font-size: .76rem;
+  font-weight: 700;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+}
+body.dark .fab .fab-tip { background: var(--gold); color: #221a11; }
+.fab:hover .fab-tip { opacity: 1; }
+
+@keyframes fab-in {
+  from { transform: translateY(24px) scale(.6); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes fab-pulse {
+  0% { transform: scale(.85); opacity: .55; }
+  70% { transform: scale(1.25); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+
+/* ---------- FOOTER 2.0 ---------- */
+
+footer {
+  background:
+    radial-gradient(700px 360px at 90% 110%, rgba(210, 74, 31, .07), transparent 62%),
+    var(--bg-2);
+}
+
+.foot-cols {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1.1fr;
+  gap: 38px;
+  align-items: start;
+}
+
+.foot-bullets { margin-top: 12px; font-size: .88rem; color: var(--muted); }
+.foot-bullets li { list-style: none; display: flex; gap: 8px; align-items: center; }
+.foot-bullets li + li { margin-top: 7px; }
+.foot-bullets .tk { color: var(--gold-deep); }
+body.dark .foot-bullets .tk { color: var(--gold); }
+
+.foot-contact { font-size: .9rem; color: var(--muted); }
+.foot-contact .row { display: flex; align-items: center; gap: 10px; }
+.foot-contact .row + .row { margin-top: 10px; }
+.foot-contact .row svg { width: 17px; height: 17px; color: var(--gold-deep); flex: none; }
+body.dark .foot-contact .row svg { color: var(--gold); }
+.foot-contact a { color: var(--ink); font-weight: 700; transition: color .2s ease; }
+body.dark .foot-contact a { color: var(--gold); }
+.foot-contact a:hover { color: var(--ember); }
+
+.social-row { display: flex; gap: 10px; margin-top: 18px; }
+.social-row a {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-2);
+  background: var(--bg);
+  color: var(--ink);
+  transition: all .25s ease;
+}
+.social-row a svg { width: 18px; height: 18px; }
+.social-row a:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); transform: translateY(-3px); box-shadow: var(--sh-1); }
+body.dark .social-row a:hover { background: var(--gold); color: #221a11; border-color: var(--gold); }
+
+
+/* ---------- JUZLAR / KICHIK YAXSHILANISHLAR ---------- */
+
+.dish-card .chip,
+.menu-thumb .time-chip { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+
+.dish-card .thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(34, 26, 17, .22), transparent 45%);
+  pointer-events: none;
+}
+
+.dish-card:hover { transform: translateY(-7px) rotate(-.2deg); }
+
+.load-note, .empty-note { font-weight: 600; }
+
+
+@media (max-width: 900px) {
+  .foot-cols { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 620px) {
+  .foot-cols { grid-template-columns: 1fr; }
+  .topbar .top-sep { display: none; }
+}

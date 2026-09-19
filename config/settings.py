@@ -17,11 +17,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
-SECRET_KEY = 'django-insecure-dql4v=zxhiu%n-i)zvc76@+c-=-78_@zp9q2b*porh@+pcyr1n'
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-dql4v=zxhiu%n-i)zvc76@+c-=-78_@zp9q2b*porh@+pcyr1n'
+)
 
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split(',')
 
 # Telegram Bot Sozlamalari
 TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '8831786871:AAG-l8p4Nt32oOjuMpBSk8Bpi3B3tnbl3J4')
@@ -39,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Uchinchi tomon kutubxonalari
-    "silk",
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
@@ -49,17 +51,22 @@ INSTALLED_APPS = [
     'main',
 ]
 
+if DEBUG:
+    INSTALLED_APPS += ['silk']
+
 MIDDLEWARE = [
-    'silk.middleware.SilkyMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # CORS middleware
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if DEBUG:
+    MIDDLEWARE.insert(0, 'silk.middleware.SilkyMiddleware')
 
 ROOT_URLCONF = 'config.urls'
 

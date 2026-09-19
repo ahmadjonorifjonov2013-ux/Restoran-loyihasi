@@ -7,7 +7,7 @@
 <title>Buyurtmani rasmiylashtirish — Restoran</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:ital,wght@0,500;0,600;0,700;1,500&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Karla:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'core/style.css' %}">
 </head>
 <body>
@@ -22,9 +22,9 @@
   <div class="wrap header-row">
     <a href="{% url 'home' %}" class="brand">
       <svg class="brand-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="20" cy="20" r="18.5" stroke="#d4a94a" stroke-width="1.2"/>
-        <path d="M13 24c1-6 4-10 7-13 3 3 6 7 7 13-2 2-5 3-7 3s-5-1-7-3z" fill="#c1440e"/>
-        <path d="M20 11v3" stroke="#d4a94a" stroke-width="1.2"/>
+        <circle cx="20" cy="20" r="18.5" stroke="#c1922c" stroke-width="1.3"/>
+        <path d="M13 24c1-6 4-10 7-13 3 3 6 7 7 13-2 2-5 3-7 3s-5-1-7-3z" fill="#d24a1f"/>
+        <path d="M20 11v3" stroke="#c1922c" stroke-width="1.3"/>
       </svg>
       <span class="brand-name">Resto<em>ran</em></span>
     </a>
@@ -36,7 +36,7 @@
     <div class="header-actions">
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Dark mode">🌙</button>
       <a class="cart-btn" id="cartLink" data-cart-link="{% url 'cart' %}" href="{% url 'cart' %}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="21" r="1.4"/><circle cx="17" cy="21" r="1.4"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 4h2l2.4 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 8H6"/><circle cx="9" cy="21" r="1.4"/><circle cx="17" cy="21" r="1.4"/></svg>
         <span class="cart-label">Savat</span>
         <span class="cart-count" id="cartCount">0</span>
       </a>
@@ -47,8 +47,11 @@
 
 <section class="section">
   <div class="wrap">
-    <div class="section-head" style="justify-content:center;border-bottom:none;">
-      <h2>Buyurtmani rasmiylashtirish</h2>
+    <div class="section-head reveal" style="justify-content:center;">
+      <div>
+        <span class="eyebrow">Yakuniy bosqich</span>
+        <h2>Buyurtmani rasmiylashtirish</h2>
+      </div>
     </div>
     <div class="receipt" id="receipt">
       <div class="load-note">
@@ -62,19 +65,31 @@
 <footer>
   <div class="wrap foot-grid">
     <div>
-      <span class="brand-name">Resto<em>ran</em></span>
+      <div class="foot-brand">
+        <svg class="brand-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="18.5" stroke="#c1922c" stroke-width="1.3"/>
+          <path d="M13 24c1-6 4-10 7-13 3 3 6 7 7 13-2 2-5 3-7 3s-5-1-7-3z" fill="#d24a1f"/>
+          <path d="M20 11v3" stroke="#c1922c" stroke-width="1.3"/>
+        </svg>
+        <span class="brand-name">Resto<em>ran</em></span>
+      </div>
       <p class="foot-note">Ma'lumotlaringizni kiriting — biz siz bilan bog'lanamiz va taomni tayyorlashni boshlaymiz.</p>
     </div>
     <div class="foot-hours">
       <strong>Ish vaqti</strong>
-      Har kuni: 09:00 – 23:00<br>
-      Yetkazib berish: 10:00 – 22:30
+      <div class="row"><i>Restoran</i> <span>09:00 – 23:00</span></div>
+      <div class="row" style="margin-top:6px;"><i>Yetkazish</i> <span>10:00 – 22:30</span></div>
     </div>
   </div>
 </footer>
 
+<button class="to-top" type="button" aria-label="Yuqoriga">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
 <script src="{% static 'core/data.js' %}"></script>
 <script src="{% static 'core/cart.js' %}"></script>
+<script src="{% static 'core/ui.js' %}"></script>
 <script>
 let cart = readCartFromURL();
 let deliveryType = 'delivery';
@@ -99,6 +114,7 @@ function render(){
   if(!ls.length){
     box.innerHTML = `
       <div class="receipt-empty">
+        <span class="emo">🛒</span>
         Savat bo'sh — avval menyudan taom tanlang.<br><br>
         <a href="{% url 'menu' %}" class="btn-primary">Menyuga o'tish</a>
       </div>`;
@@ -113,15 +129,23 @@ function render(){
       <div class="muted">${ls.length} ta taom · ${fmt(total)} so'm</div>
     </div>
     <div class="toggle-row">
-      <button type="button" class="toggle-opt active" data-type="delivery">Yetkazib berish</button>
-      <button type="button" class="toggle-opt" data-type="pickup">Olib ketish</button>
+      <button type="button" class="toggle-opt active" data-type="delivery">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="19" r="2.2"/><circle cx="17" cy="19" r="2.2"/><path d="M6 17V6h11l2 6h-8v5"/></svg>
+        Yetkazib berish
+      </button>
+      <button type="button" class="toggle-opt" data-type="pickup">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-6 9 6v12H3z"/><path d="M9 21v-7h6v7"/></svg>
+        Olib ketish
+      </button>
     </div>
     <div class="field"><label for="ckName">Ismingiz</label><input id="ckName" type="text" placeholder="Ism familiya"></div>
     <div class="field"><label for="ckPhone">Telefon raqam</label><input id="ckPhone" type="tel" placeholder="+998 90 123 45 67"></div>
     <div class="field" id="addrField"><label for="ckAddr">Yetkazib berish manzili</label><input id="ckAddr" type="text" placeholder="Ko'cha, uy, kvartira"></div>
     <div class="field"><label for="ckNote">Izoh (ixtiyoriy)</label><textarea id="ckNote" rows="2" placeholder="Qo'shimcha izoh"></textarea></div>
     <div class="form-error" id="ckError">Iltimos, ism va telefon raqamni to'ldiring.</div>
-    <div class="receipt-sum" style="border-top:1px dashed var(--line-strong);padding-top:16px;">
+    <div class="receipt-sum">
+      <div class="sum-row"><span>Taomlar narxi</span><span>${fmt(total)} so'm</span></div>
+      <div class="sum-row"><span>Yetkazish</span><span>Parchin (bepul)</span></div>
       <div class="sum-row total"><span>Jami</span><span>${fmt(total)} so'm</span></div>
       <button class="btn-primary" style="width:100%;" id="ckSubmit">Buyurtma berish</button>
     </div>
@@ -160,8 +184,8 @@ async function submitOrder(){
   const note = document.getElementById('ckNote').value.trim();
   const errEl = document.getElementById('ckError');
 
-  if(!name || !phone){ errEl.style.display='block'; return; }
-  errEl.style.display='none';
+  if(!name || !phone){ errEl.classList.add('show'); return; }
+  errEl.classList.remove('show');
 
   const ls = lines();
   const payload = {
@@ -174,13 +198,13 @@ async function submitOrder(){
   };
 
   const btn = document.getElementById('ckSubmit');
-  btn.disabled = true; 
+  btn.disabled = true;
   btn.textContent = 'Yuborilmoqda…';
 
   try{
     const res = await fetch("{% url 'telegram-order' %}", {
       method:'POST',
-      headers:{ 
+      headers:{
         'Content-Type':'application/json',
         'X-CSRFToken': getCookie('csrftoken')
       },
@@ -191,22 +215,20 @@ async function submitOrder(){
       const errJson = await res.json().catch(()=>({}));
       throw new Error(errJson.error || `HTTP ${res.status}`);
     }
-  }catch(e){ 
+  }catch(e){
     console.error("Xatolik:", e);
     errEl.textContent = "Buyurtma yuborilmadi. Internetni tekshiring va qayta urinib ko'ring.";
-    errEl.style.display='block';
+    errEl.classList.add('show');
     btn.disabled = false;
     btn.textContent = 'Buyurtma berish';
     return;
   }
 
-  // Savatni URL'dan ham, xotiradan ham to'liq tozalaymiz
   if (typeof clearCart === 'function') {
     cart = clearCart();
   }
 
-  // Buyurtma yuborilgach to'g'ridan-to'g'ri Menyuga yo'naltiramiz
-  window.location.href = "{% url 'menu' %}";
+  window.location.href = "{% url 'order_success' %}";
 }
 
 loadMenuData().then(()=>{
@@ -221,11 +243,9 @@ if (navBurger && siteHeader) {
   navBurger.addEventListener("click", () => siteHeader.classList.toggle("nav-open"));
 }
 
-// Theme switch logika
+/* DARK MODE */
 const themeToggle = document.getElementById("themeToggle");
-if (document.body.classList.contains("dark")) {
-  themeToggle.textContent = "☀️";
-}
+if (document.body.classList.contains("dark")) themeToggle.textContent = "☀️";
 themeToggle.addEventListener("click", function () {
   document.body.classList.toggle("dark");
   const isDark = document.body.classList.contains("dark");

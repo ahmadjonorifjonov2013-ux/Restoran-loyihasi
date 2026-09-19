@@ -11,7 +11,9 @@ const field = {
   dishName: d => d.nom || d.name || d.title,
   dishDesc: d => d.tavsif || d.description || '',
   dishPrice: d => d.narx || d.price || 0,
-  dishImg: d => d.rasm || d.image || null
+  dishImg: d => d.rasm || d.image || null,
+  dishCatName: d => d.kategoriya_nomi || d.category_name || d.kategoriya?.nom || '',
+  dishTime: d => d.tayyorlash_vaqti || d.prep_minutes || 0
 };
 
 // Summani chiroyli formatda chiqarish (masalan: 25 000)

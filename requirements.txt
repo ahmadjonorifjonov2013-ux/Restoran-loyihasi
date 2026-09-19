@@ -14,6 +14,7 @@ django-filter==26.1
 django-silk==5.5.2
 djangorestframework==3.18.0
 djangorestframework_simplejwt==5.5.1
+gunicorn==23.0.0
 requests==2.34.2
 frozenlist==1.8.0
 h11==0.16.0

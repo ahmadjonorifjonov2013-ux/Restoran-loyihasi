@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Biz haqimizda — Restoran</title>
+<title>Buyurtma qabul qilindi — Restoran</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Karla:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -31,7 +31,7 @@
     <nav class="header-nav">
       <a href="{% url 'home' %}">Bosh sahifa</a>
       <a href="{% url 'menu' %}">Menyu</a>
-      <a href="{% url 'about' %}" class="current">Biz haqimizda</a>
+      <a href="{% url 'about' %}">Biz haqimizda</a>
     </nav>
     <div class="header-actions">
       <button class="theme-toggle" id="themeToggle" type="button" aria-label="Dark mode">🌙</button>
@@ -45,46 +45,29 @@
   </div>
 </header>
 
-<section class="about-hero">
+<section class="section">
   <div class="wrap">
-    <span class="eyebrow">1998 yildan buyon dasturxon boshida</span>
-    <h1>Har bir taomda oilaviy retsept yashaydi</h1>
-    <p class="lede">Restoranimiz kichik oilaviy oshxonadan boshlangan. Bugun ham har bir taomni xuddi mehmonga tayyorlagandek pishiramiz — shoshilmasdan, asl retsept bo'yicha.</p>
+    <div class="receipt center">
 
-    <div class="about-grid">
-      <div class="about-cell reveal">
-        <div class="ic">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4v10l8 4 8-4V7z"/><path d="M12 3v18M4 7l8 4 8-4"/></svg>
-        </div>
-        <h3>Yangi mahsulotlar</h3>
-        <p>Har kuni ertalab bozordan yangi go'sht, sabzavot va ko'katlar olib kelinadi.</p>
-      </div>
-      <div class="about-cell reveal">
-        <div class="ic">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="19" r="2.2"/><circle cx="17" cy="19" r="2.2"/><path d="M6 17V6h11l2 6h-8v5"/></svg>
-        </div>
-        <h3>Tez yetkazib berish</h3>
-        <p>Buyurtmangiz o'rtacha 30–40 daqiqada tayyor bo'lib, eshigingizga yetkaziladi.</p>
-      </div>
-      <div class="about-cell reveal">
-        <div class="ic">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3c3 3 5 6 5 9a5 5 0 0 1-10 0c0-3 2-6 5-9z"/><path d="M8.5 20h7"/></svg>
-        </div>
-        <h3>Oilaviy retseptlar</h3>
-        <p>Osh, manti va shashlik retseptlari avloddan-avlodga o'tib kelmoqda.</p>
-      </div>
-      <div class="about-cell reveal">
-        <div class="ic">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-4.6-9.3-9C1 8.5 3.5 5 7 5c2 0 3.5 1 5 3 1.5-2 3-3 5-3 3.5 0 6 3.5 4.3 7-2.3 4.4-9.3 9-9.3 9z"/></svg>
-        </div>
-        <h3>Mehmondo'stlik</h3>
-        <p>Har bir buyurtma — bizning dasturxonimizga taklif qilingan mehmon uchun.</p>
-      </div>
-    </div>
+      <svg class="confirm-stamp" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="44" cy="44" r="42" stroke="#2f7d6b" stroke-width="3" stroke-dasharray="4 4"/>
+        <circle cx="44" cy="44" r="33" fill="#2f7d6b"/>
+        <path d="M28 45l11 11 22-24" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
 
-    <div class="hero-actions reveal" style="margin-top:40px;">
-      <a href="{% url 'menu' %}" class="btn-primary">Menyuni ko'rish</a>
-      <a href="{% url 'home' %}" class="btn-ghost">Bosh sahifa</a>
+      <div class="eyebrow">Buyurtma muvaffaqiyatli qabul qilindi</div>
+      <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);margin-top:10px;">Rahmat! Dasturxon oshiga tayyor</h2>
+
+      <p style="color:var(--muted);max-width:44ch;margin:16px auto 0;">
+        Operatorlarimiz tez orada siz bilan bog'lanadi va taomni tayyorlashga kirishamiz.
+        O'rtacha yetkazish vaqti — 30–40 daqiqa.
+      </p>
+
+      <div style="margin-top:34px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+        <a href="{% url 'menu' %}" class="btn-primary">Yana buyurtma berish</a>
+        <a href="{% url 'home' %}" class="btn-ghost">Bosh sahifa</a>
+      </div>
+
     </div>
   </div>
 </section>
@@ -100,18 +83,12 @@
         </svg>
         <span class="brand-name">Resto<em>ran</em></span>
       </div>
-      <p class="foot-note">Savolingiz bo'lsa, biz bilan bog'laning — yordam berishdan mamnunmiz.</p>
+      <p class="foot-note">Buyurtmangiz biz uchun aziz mehmon. Tez kuzatamiz!</p>
     </div>
     <div class="foot-hours">
       <strong>Ish vaqti</strong>
       <div class="row"><i>Restoran</i> <span>09:00 – 23:00</span></div>
       <div class="row" style="margin-top:6px;"><i>Yetkazish</i> <span>10:00 – 22:30</span></div>
-    </div>
-  </div>
-  <div class="wrap">
-    <div class="foot-bottom">
-      <span>© 2026 Restoran — barcha huquqlar himoyalangan</span>
-      <span>Milliy taomlar, bugun ustozdir.</span>
     </div>
   </div>
 </footer>
@@ -127,14 +104,12 @@
   renderCartBadge(cart);
   refreshCartLinks(cart);
 
-  /* MOBILE NAV */
   const navBurger = document.getElementById("navBurger");
   const siteHeader = document.querySelector(".site-header");
   if (navBurger && siteHeader) {
     navBurger.addEventListener("click", () => siteHeader.classList.toggle("nav-open"));
   }
 
-  /* DARK MODE */
   const themeToggle = document.getElementById("themeToggle");
   if (document.body.classList.contains("dark")) themeToggle.textContent = "☀️";
   themeToggle.addEventListener("click", () => {
